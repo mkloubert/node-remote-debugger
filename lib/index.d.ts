@@ -1,4 +1,5 @@
 /// <reference types="node" />
+import * as nrd_helpers from './helpers';
 /**
  * The default host address.
  */
@@ -55,11 +56,11 @@ export interface EventData {
     /**
      * Stores the stack trace.
      */
-    backtrace: StackFrame[];
+    backtrace: nrd_helpers.StackFrame[];
     /**
      * The calling line.
      */
-    calling_line: StackFrame;
+    calling_line: nrd_helpers.StackFrame;
     /**
      * Defines the condition value.
      */
@@ -232,27 +233,6 @@ export interface RemoteDebuggerVariable {
     v?: any;
 }
 /**
- * A frame of a stack trace.
- */
-export interface StackFrame {
-    /**
-     * The column.
-     */
-    column?: number;
-    /**
-     * The file path.
-     */
-    file?: string;
-    /**
-     * The name of the underlying function.
-     */
-    func?: string;
-    /**
-     * The line.
-     */
-    line?: number;
-}
-/**
  * Wraps a value.
  */
 export interface ValueWrapper<T> {
@@ -324,12 +304,6 @@ export declare class RemoteDebugger {
      * Stores the error handler.
      */
     errorHandler: ErrorHandler;
-    /**
-     * Returns the stack trace.
-     *
-     * @param {number} [skipFrames] The optional number of frames to skip.
-     */
-    protected getStackTrace(skipFrames?: number): StackFrame[];
     /**
      * Transforms JSON data into a new format.
      */

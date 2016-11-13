@@ -23,6 +23,76 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+import FS = require('fs');
+import Path = require('path');
+
+/**
+ * A frame of a stack trace.
+ */
+export interface StackFrame {
+    /**
+     * The column.
+     */
+    column?: number;
+
+    /**
+     * The file path.
+     */
+    file?: string;
+
+    /**
+     * The name of the underlying function.
+     */
+    func?: string;
+
+    /**
+     * The line.
+     */
+    line?: number;
+}
+
+/**
+ * Returns the stack trace.
+ * 
+ * @param {number} [skipFrames] The optional number of frames to skip.
+ */
+export function getStackTrace(skipFrames = 0): StackFrame[] {
+    let frames: StackFrame[] = [];
+
+    let err = new Error("");
+
+    let REGEX = /^(at)(\s+)(\S+)(\s+)(\()(.*)(\:)(\d*)(\:)(\d*)(\))$/i;
+
+    let stack = err.stack.split('\n');
+    for (let i = 3 + skipFrames; i < stack.length; i++) {
+        let line = stack[i].trim();
+        if (!REGEX.test(line)) {
+            continue;
+        }
+
+        let match = REGEX.exec(line);
+
+        let newFrame: StackFrame = {
+            column: match[10] ? parseInt(match[10]) : null,
+            file: match[6],
+            func: match[3],
+            line: match[8] ? parseInt(match[8]) : null,
+        };
+
+        if (!newFrame.file) {
+            continue;
+        }
+
+        if (!Path.isAbsolute(newFrame.file) || !FS.existsSync(newFrame.file)) {
+            continue;
+        }
+
+        frames.push(newFrame);
+    }
+
+    return frames;
+}
+
 /**
  * Checks if a value is a function.
  * 

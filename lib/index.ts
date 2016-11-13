@@ -88,12 +88,12 @@ export interface EventData {
     /**
      * Stores the stack trace.
      */
-    backtrace: StackFrame[];
+    backtrace: nrd_helpers.StackFrame[];
 
     /**
      * The calling line.
      */
-    calling_line: StackFrame;
+    calling_line: nrd_helpers.StackFrame;
 
     /**
      * Defines the condition value.
@@ -302,31 +302,6 @@ export interface RemoteDebuggerVariable {
 }
 
 /**
- * A frame of a stack trace.
- */
-export interface StackFrame {
-    /**
-     * The column.
-     */
-    column?: number;
-
-    /**
-     * The file path.
-     */
-    file?: string;
-
-    /**
-     * The name of the underlying function.
-     */
-    func?: string;
-
-    /**
-     * The line.
-     */
-    line?: number;
-}
-
-/**
  * Wraps a value.
  */
 export interface ValueWrapper<T> {
@@ -473,7 +448,7 @@ export class RemoteDebugger {
         let filter = this.entryFilter;
         let transformer = this.jsonTransformer;
 
-        let backtrace = this.getStackTrace();
+        let backtrace = nrd_helpers.getStackTrace();
 
         let callingLine = backtrace[0];
 
@@ -713,48 +688,6 @@ export class RemoteDebugger {
      * Stores the error handler.
      */
     public errorHandler: ErrorHandler;
-
-    /**
-     * Returns the stack trace.
-     * 
-     * @param {number} [skipFrames] The optional number of frames to skip.
-     */
-    protected getStackTrace(skipFrames = 0): StackFrame[] {
-        let frames: StackFrame[] = [];
-
-        let err = new Error("");
-
-        let REGEX = /^(at)(\s+)(\S+)(\s+)(\()(.*)(\:)(\d*)(\:)(\d*)(\))$/i;
-
-        let stack = err.stack.split('\n');
-        for (let i = 3 + skipFrames; i < stack.length; i++) {
-            let line = stack[i].trim();
-            if (!REGEX.test(line)) {
-                continue;
-            }
-
-            let match = REGEX.exec(line);
-
-            let newFrame: StackFrame = {
-                column: match[10] ? parseInt(match[10]) : null,
-                file: match[6],
-                func: match[3],
-                line: match[8] ? parseInt(match[8]) : null,
-            };
-
-            if (!newFrame.file) {
-                continue;
-            }
-
-            if (!Path.isAbsolute(newFrame.file) || !FS.existsSync(newFrame.file)) {
-                continue;
-            }
-
-            frames.push(newFrame);
-        }
-
-        return frames;
-    }
 
     /**
      * Transforms JSON data into a new format.

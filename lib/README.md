@@ -45,3 +45,7 @@ remoteDebugger.dbg({
     c: 33,
 });
 ```
+
+A possible result can be this here:
+
+![VS Code screenshot 1](https://raw.githubusercontent.com/mkloubert/node-remote-debugger/master/img/node-remote-debugger-ss-1.png)
