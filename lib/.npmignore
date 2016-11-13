@@ -1,3 +1,4 @@
 **/*.map
 index.ts
+helpers.ts
 node_modules

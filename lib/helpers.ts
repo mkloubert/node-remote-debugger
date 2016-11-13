@@ -1,3 +1,5 @@
+/// <reference types="node" />
+
 // The MIT License (MIT)
 // 
 // vs-remote-debugger (Node.js SDK) (https://github.com/mkloubert/node-remote-debugger)
@@ -21,24 +23,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-import { RemoteDebugger } from './lib/index';
-import * as ZLib from 'zlib';
-
-let remoteDebugger = new RemoteDebugger();
-
-remoteDebugger.addHost('localhost', 23979);
-remoteDebugger.scriptRoot = __dirname;
-
-remoteDebugger.jsonTransformer = (buff) => {
-    return ZLib.gzipSync(buff);
-};
-
-remoteDebugger.errorHandler = (type, ctx) => {
-    console.log('[ERROR] :: ' + type + ' => [' + ctx.code + '] ' + ctx.message);
-};
-
-remoteDebugger.dbg({
-    a: 11,
-    b: 22,
-    c: 33,
-});
+/**
+ * Checks if a value is a function.
+ * 
+ * @param {any} val The value to check.
+ * 
+ * @return {boolean} Is function or not.
+ */
+export function isCallable(val: any): boolean {
+    return typeof val === "function";
+}

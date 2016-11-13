@@ -1,12 +1,12 @@
 /// <reference types="node" />
 /**
+ * The default host address.
+ */
+export declare const DEFAULT_HOST: string;
+/**
  * The default port.
  */
 export declare const DEFAULT_PORT: number;
-/**
- * The default timeout.
- */
-export declare const DEFAULT_TIMEOUT: number;
 /**
  * A condition.
  */
@@ -44,15 +44,46 @@ export interface ErrorContext {
      */
     message?: string;
 }
+/**
+ * A debugger event / context.
+ */
 export interface EventData {
+    /**
+     * Stores the stack trace.
+     */
     backtrace: StackFrame[];
+    /**
+     * The calling line.
+     */
+    calling_line: StackFrame;
+    /**
+     * Defines the condition value.
+     */
     condition?: boolean;
+    /**
+     * The underlying debugger.
+     */
     debugger: RemoteDebugger;
+    /**
+     * The current host.
+     */
     host: HostData;
+    /**
+     * The underlying debugger.
+     */
     me: RemoteDebugger;
+    /**
+     * The function that provides the connection data of the target host.
+     */
     provider: HostProvider;
+    /**
+     * The current timestamp.
+     */
     time: Date;
-    vars?: any[];
+    /**
+     * The debugger variables.
+     */
+    vars?: RemoteDebuggerVariable[];
 }
 /**
  * Stores data for a target host.
@@ -66,10 +97,6 @@ export interface HostData {
      * The TCP port.
      */
     port?: number;
-    /**
-     * The timeout.
-     */
-    timeout?: number;
 }
 /**
  * Describes a debugger entry.
@@ -222,6 +249,15 @@ export interface StackFrame {
     line?: number;
 }
 /**
+ * Wraps a value.
+ */
+export interface ValueWrapper<T> {
+    /**
+     * The wrapped value.
+     */
+    value?: T;
+}
+/**
  * A remote debugger.
  *
  * @author Marcel Joachim Kloubert <marcel.kloubert@gmx.net>
@@ -232,11 +268,23 @@ export declare class RemoteDebugger {
      * and port of the remote debugger host.
      */
     protected _hostProviders: HostProvider[];
-    addHost(addressOrProvider?: string | HostProvider, port?: number, timeout?: number): RemoteDebugger;
+    /**
+     * Adds a target host.
+     *
+     * @param {string | HostProvider} The host address or a function that provides the host data.
+     * @param {number} [port] The custom TCP port.
+     *
+     * @chainable
+     */
+    addHost(addressOrProvider?: string | HostProvider, port?: number): RemoteDebugger;
     /**
      * The name of the app or a function that provides it.
      */
     app: string | DataProvider<string>;
+    /**
+     * Gets the current thread or the function that provides it.
+     */
+    currentThread: RemoteDebuggerThread | DataProvider<RemoteDebuggerThread>;
     /**
      * Sends a debugger message.
      *
@@ -255,7 +303,7 @@ export declare class RemoteDebugger {
     /**
      * The default sender logic.
      */
-    defaultSender(buffer: Buffer): void;
+    defaultSender(buffer: Buffer, data: EventData, errHandler: ErrorHandler): void;
     /**
      * Stores the error handler.
      */
@@ -267,17 +315,13 @@ export declare class RemoteDebugger {
      */
     protected getStackTrace(skipFrames?: number): StackFrame[];
     /**
-     * Checks if a value is a function.
-     *
-     * @param {any} val The value to check.
-     *
-     * @return {boolean} Is function or not.
-     */
-    protected isCallable(val: any): boolean;
-    /**
      * Transforms JSON data into a new format.
      */
     jsonTransformer: DataTransformer;
+    /**
+     * Gets the path to the script's root directory or the function that provides it.
+     */
+    scriptRoot: string | DataProvider<string>;
     /**
      * A function that is used to send the data.
      */
@@ -286,6 +330,27 @@ export declare class RemoteDebugger {
      * The name of the target client or a function that provides it.
      */
     targetClient: string | DataProvider<string>;
+    /**
+     * Tries to convert a full path to a relative path.
+     *
+     * @param {string} path The input value.
+     *
+     * @return {string} The output value.
+     */
+    toRelativePath(path: string): string;
+    /**
+     * Creates a variable entry.
+     *
+     * @param {string} $name The name of the variable.
+     * @param {any} $value The value.
+     * @param {number} [ref] The reference.
+     * @param {ValueWrapper<number>} {nextVarRef} The next variable reference value.
+     * @param {number} [step] The current step.
+     * @param {number} [maxSteps] The maximum number of steps.
+     *
+     * @return {RemoteDebuggerVariable} The entry.
+     */
+    toVariableEntry(name: string, value: any, ref?: number, nextVarRef?: ValueWrapper<number>, step?: number, maxSteps?: number): RemoteDebuggerVariable;
     /**
      * Unwarps a value.
      *
