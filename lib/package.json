@@ -1,0 +1,31 @@
+{
+  "name": "node-remote-debugger",
+  "version": "0.0.1",
+  "description": "Server-side Node.js library for interacting with 'vs-remote-debugger' Visual Studio Code extension, e.g.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mkloubert/node-remote-debugger.git"
+  },
+  "keywords": [
+    "visual",
+    "studio",
+    "code",
+    "vs",
+    "vscode",
+    "debugger",
+    "debugging",
+    "tcp",
+    "http",
+    "server"
+  ],
+  "author": "mkloubert",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mkloubert/node-remote-debugger/issues"
+  },
+  "homepage": "https://github.com/mkloubert/node-remote-debugger#readme",
+  "devDependencies": {
+    "@types/node": "^6.0.46"
+  }
+}
