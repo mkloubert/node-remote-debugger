@@ -4,6 +4,10 @@
  */
 export declare const DEFAULT_HOST: string;
 /**
+ * Default value for the maximum depth of a variable tree.
+ */
+export declare const DEFAULT_MAX_DEPTH: number;
+/**
  * The default port.
  */
 export declare const DEFAULT_PORT: number;
@@ -330,6 +334,11 @@ export declare class RemoteDebugger {
      * Transforms JSON data into a new format.
      */
     jsonTransformer: DataTransformer;
+    /**
+     * A value that defines how deep a tree of
+     * variables can be to prevent stack overflows.
+     */
+    maxDepth: number | DataProvider<number>;
     /**
      * Gets the path to the script's root directory or the function that provides it.
      */

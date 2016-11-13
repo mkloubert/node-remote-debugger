@@ -37,8 +37,36 @@ remoteDebugger.errorHandler = (type, ctx) => {
     console.log('[ERROR] :: ' + type + ' => [' + ctx.code + '] ' + ctx.message);
 };
 
+let a = 11;
+let b = 22;
+let c = 33;
+
 remoteDebugger.dbg({
-    a: 11,
-    b: 22,
-    c: 33,
+    'a': 11,
+    'b': 22,
+    'c': 33,
 });
+
+let aa = '11a';
+let bb = '22b';
+let cc = '33c';
+
+remoteDebugger.dbgIf(
+    true,
+    {
+        'aa': aa,
+        'bb': bb,
+        'cc': cc,
+    });
+
+let aaa = '_11a';
+let bbb = '_22b';
+let ccc = '_33c';
+
+remoteDebugger.dbgIf(
+    () => false,
+    {
+        'aaa': aaa,
+        'bbb': bbb,
+        'ccc': ccc,
+    });

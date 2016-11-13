@@ -33,6 +33,10 @@ import * as nrd_helpers from './helpers';
  */
 export const DEFAULT_HOST = '127.0.0.1';
 /**
+ * Default value for the maximum depth of a variable tree.
+ */
+export const DEFAULT_MAX_DEPTH = 32;
+/**
  * The default port.
  */
 export const DEFAULT_PORT = 5979;
@@ -473,8 +477,6 @@ export class RemoteDebugger {
 
         let callingLine = backtrace[0];
 
-        let maxSteps = 32;
-
         this._hostProviders.forEach((provider, providerIndex) => {
             let connData = provider(me);
             if (!connData) {
@@ -490,6 +492,14 @@ export class RemoteDebugger {
                 provider: provider,
                 time: now,
             };
+
+            let maxSteps = <number>me.unwrapValue(me.maxDepth, eventData);
+            if (maxSteps) {
+                maxSteps = parseInt(('' + maxSteps).trim());
+            }
+            if (!maxSteps) {
+                maxSteps = DEFAULT_MAX_DEPTH;
+            }
 
             try {
                 let nextVarRef: ValueWrapper<number> = { value: 1 };
@@ -750,6 +760,12 @@ export class RemoteDebugger {
      * Transforms JSON data into a new format.
      */
     public jsonTransformer: DataTransformer;
+
+    /**
+     * A value that defines how deep a tree of
+     * variables can be to prevent stack overflows.
+     */
+    public maxDepth: number | DataProvider<number>;
 
     /**
      * Gets the path to the script's root directory or the function that provides it.
