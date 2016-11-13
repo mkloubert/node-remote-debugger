@@ -411,6 +411,11 @@ export class RemoteDebugger {
     public app: string | DataProvider<string>;
 
     /**
+     * The name for the current function stack frame or the function that provides it.
+     */
+    public currentFunctionStackFrame: string | DataProvider<string>;
+
+    /**
      * Gets the current thread or the function that provides it.
      */
     public currentThread: RemoteDebuggerThread | DataProvider<RemoteDebuggerThread>;
@@ -461,6 +466,7 @@ export class RemoteDebugger {
             condition = () => conditionValue;
         }
 
+        let filter = this.entryFilter;
         let transformer = this.jsonTransformer;
 
         let backtrace = this.getStackTrace();
@@ -514,7 +520,7 @@ export class RemoteDebugger {
                     v: debuggerVars,
                 };
 
-                let client = <string>me.unwrapValue(me.targetClient);
+                let client = <string>me.unwrapValue(me.targetClient, eventData);
                 if (client) {
                     entry.c = '' + client;
                 }
@@ -524,7 +530,7 @@ export class RemoteDebugger {
                     entry.a = '' + app;
                 }
 
-                let currentThread = <RemoteDebuggerThread>me.unwrapValue(me.currentThread);
+                let currentThread = <RemoteDebuggerThread>me.unwrapValue(me.currentThread, eventData);
                 if (!currentThread) {
                     currentThread = {
                         i: 1,
@@ -562,8 +568,15 @@ export class RemoteDebugger {
 
                     stackFrame.s = [];
 
-                    let sfCurrentFunc = 'Current function';
-                    let sfDebugger = 'Debugger';
+                    let sfCurrentFunc = <string>me.unwrapValue(me.currentFunctionStackFrame, eventData);
+                    if (!sfCurrentFunc) {
+                        sfCurrentFunc = 'Current function';
+                    }
+
+                    let sfDebugger = <string>me.unwrapValue(me.debuggerStackFrame, eventData);
+                    if (!sfDebugger) {
+                        sfDebugger = 'Debugger';
+                    }
 
                     ++nextVarRef.value;
 
@@ -582,38 +595,49 @@ export class RemoteDebugger {
                     entry.s.push(stackFrame);
                 });
 
-                //TODO
+                if (filter) {
+                    entry = <RemoteDebuggerEntry>me.unwrapValue(filter(entry),
+                                                                eventData);
+                }
 
                 if (!entry) {
+                    // nothing to send
                     return;
                 }
 
                 let json = JSON.stringify(entry);
-
-                console.log(JSON.stringify(entry, null, 4));
-
-                if (json) {
-                    let data = new Buffer(json, 'utf8');
-                    if (transformer) {
-                        data = transformer(data);
-                    }
-
-                    if (!data || data.length < 1) {
-                        return;
-                    }
-
-                    sender(data, eventData, handlerError);
+                if (!json) {
+                    // nothing to send
+                    return;    
                 }
+
+                let data = new Buffer(json, 'utf8');
+                if (transformer) {
+                    data = transformer(data);
+                }
+
+                if (!data || data.length < 1) {
+                    // nothing to send
+                    return;
+                }
+
+                sender(data, eventData, handlerError);
             }
             catch (e) {
                 handlerError('exception',
                              {
+                                 code: 0,
                                  message: '' + e,
                              },
                              eventData);
             }
         });
     }
+
+    /**
+     * The name for the Debugger stack frame or the function that provides it.
+     */
+    public debuggerStackFrame: string | DataProvider<string>;
 
     /**
      * The default sender logic.
@@ -669,6 +693,11 @@ export class RemoteDebugger {
             });
         });
     }
+
+    /**
+     * A function that filters an entry BEFORE it is send.
+     */
+    public entryFilter: (input: RemoteDebuggerEntry) => RemoteDebuggerEntry | DataProvider<RemoteDebuggerEntry>;
 
     /**
      * Stores the error handler.

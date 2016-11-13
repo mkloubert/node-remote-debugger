@@ -282,6 +282,10 @@ export declare class RemoteDebugger {
      */
     app: string | DataProvider<string>;
     /**
+     * The name for the current function stack frame or the function that provides it.
+     */
+    currentFunctionStackFrame: string | DataProvider<string>;
+    /**
      * Gets the current thread or the function that provides it.
      */
     currentThread: RemoteDebuggerThread | DataProvider<RemoteDebuggerThread>;
@@ -301,9 +305,17 @@ export declare class RemoteDebugger {
      */
     dbgIf(condition: Condition | boolean, vars?: any, skipFrames?: number): void;
     /**
+     * The name for the Debugger stack frame or the function that provides it.
+     */
+    debuggerStackFrame: string | DataProvider<string>;
+    /**
      * The default sender logic.
      */
     defaultSender(buffer: Buffer, data: EventData, errHandler: ErrorHandler): void;
+    /**
+     * A function that filters an entry BEFORE it is send.
+     */
+    entryFilter: (input: RemoteDebuggerEntry) => RemoteDebuggerEntry | DataProvider<RemoteDebuggerEntry>;
     /**
      * Stores the error handler.
      */
