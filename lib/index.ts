@@ -27,16 +27,43 @@ import FS = require('fs');
 import Net = require('net');
 import Path = require('path');
 
+/**
+ * A condition.
+ */
 export type Condition = () => boolean;
+/**
+ * A handler for sending a debugger entry.
+ */
 export type Sender = (buffer: Buffer) => void;
 
+/**
+ * A debugger entry.
+ */
 export interface RemoteDebuggerEntry {
 }
 
-interface StackFrame {
+/**
+ * A frame of a stack trace.
+ */
+export interface StackFrame {
+    /**
+     * The column.
+     */
     column?: number;
+
+    /**
+     * The file path.
+     */
     file?: string;
+
+    /**
+     * The name of the underlying function.
+     */
     func?: string;
+
+    /**
+     * The line.
+     */
     line?: number;
 }
 
