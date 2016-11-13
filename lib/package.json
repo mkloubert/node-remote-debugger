@@ -1,6 +1,6 @@
 {
   "name": "node-remote-debugger",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Server-side Node.js library for interacting with 'vs-remote-debugger' Visual Studio Code extension, e.g.",
   "main": "index.js",
   "repository": {

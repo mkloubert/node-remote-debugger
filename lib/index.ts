@@ -748,7 +748,7 @@ export class RemoteDebugger {
         try {
             let normalizedPath = FS.realpathSync(path);
 
-            let scriptRoot = '' + this.unwrapValue(this.scriptRoot);
+            let scriptRoot = this.unwrapValue(this.scriptRoot);
             if (!scriptRoot) {
                 scriptRoot = process.cwd();
             }
@@ -756,9 +756,10 @@ export class RemoteDebugger {
                 scriptRoot = __dirname;
             }
 
-            if (FS.existsSync(scriptRoot)) {
-                if (0 == normalizedPath.indexOf(scriptRoot)) {
-                    path = normalizedPath.substr(scriptRoot.length);
+            let sr = '' + scriptRoot;
+            if (FS.existsSync(sr)) {
+                if (0 == normalizedPath.indexOf(sr)) {
+                    path = normalizedPath.substr(sr.length);
                     path = path.replace(Path.sep, '/');
                 }
             }
