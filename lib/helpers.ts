@@ -26,6 +26,29 @@
 import FS = require('fs');
 import Path = require('path');
 
+const REGEX_FUNC_NAME = /function (.{1,})\(/;
+const REGEX_STACKFRAME = /^(at)(\s+)(\S+)(\s+)(\()(.*)(\:)(\d*)(\:)(\d*)(\))$/i;
+
+/**
+ * Information about a function. 
+ */
+export interface FunctionInfo {
+    /**
+     * The list of arguments.
+     */
+    args: string[];
+
+    /**
+     * The name.
+     */
+    name: string;
+
+    /**
+     * The underlying object / value.
+     */
+    obj: any;
+}
+
 /**
  * A frame of a stack trace.
  */
@@ -52,6 +75,57 @@ export interface StackFrame {
 }
 
 /**
+ * Gets information about a function.
+ * 
+ * @param {any} func The function value.
+ * 
+ * @return {FunctionInfo} The function information.
+ */
+export function getFunctionInfo(func: any): FunctionInfo {
+    if (!isCallable(func)) {
+        return;
+    }
+
+    let str: string = func.toString();
+
+    // s. https://stackoverflow.com/questions/1007981/how-to-get-function-parameter-names-values-dynamically-from-javascript
+    //
+    // author: humbletim (https://stackoverflow.com/users/1684079/humbletim)
+    let args = str.replace(/[/][/].*$/mg,'')  // strip single-line comments
+                  .replace(/\s+/g, '')  // strip white space
+                  .replace(/[/][*][^/*]*[*][/]/g, '')  // strip multi-line comments  
+                  .split('){', 1)[0].replace(/^[^(]*[(]/, '')  // extract the parameters  
+                  .replace(/=[^,]+/g, '')  // strip any ES6 defaults  
+                  .split(',')
+                  .filter(x => x);  // split & filter [""];
+
+    console.log(JSON.stringify(args));
+
+    return {
+        args: args,
+        name: func.name,
+        obj: func,
+    };
+}
+
+/**
+ * Tries to return the name of an object.
+ * 
+ * @param {any} val The value / object.
+ * 
+ * @return {String} The name.
+ */
+export function getObjectName(val: any): string {
+    if (!val) {
+        return;
+    }
+
+    let match = REGEX_FUNC_NAME.exec((val).constructor.toString());
+
+    return (match && match.length > 1) ? match[1] : "";
+}
+
+/**
  * Returns the stack trace.
  * 
  * @param {number} [skipFrames] The optional number of frames to skip.
@@ -61,16 +135,14 @@ export function getStackTrace(skipFrames = 0): StackFrame[] {
 
     let err = new Error("");
 
-    let REGEX = /^(at)(\s+)(\S+)(\s+)(\()(.*)(\:)(\d*)(\:)(\d*)(\))$/i;
-
     let stack = err.stack.split('\n');
     for (let i = 3 + skipFrames; i < stack.length; i++) {
         let line = stack[i].trim();
-        if (!REGEX.test(line)) {
+        if (!REGEX_STACKFRAME.test(line)) {
             continue;
         }
 
-        let match = REGEX.exec(line);
+        let match = REGEX_STACKFRAME.exec(line);
 
         let newFrame: StackFrame = {
             column: match[10] ? parseInt(match[10]) : null,

@@ -1,4 +1,21 @@
 /**
+ * Information about a function.
+ */
+export interface FunctionInfo {
+    /**
+     * The list of arguments.
+     */
+    args: string[];
+    /**
+     * The name.
+     */
+    name: string;
+    /**
+     * The underlying object / value.
+     */
+    obj: any;
+}
+/**
  * A frame of a stack trace.
  */
 export interface StackFrame {
@@ -19,6 +36,22 @@ export interface StackFrame {
      */
     line?: number;
 }
+/**
+ * Gets information about a function.
+ *
+ * @param {any} func The function value.
+ *
+ * @return {FunctionInfo} The function information.
+ */
+export declare function getFunctionInfo(func: any): FunctionInfo;
+/**
+ * Tries to return the name of an object.
+ *
+ * @param {any} val The value / object.
+ *
+ * @return {String} The name.
+ */
+export declare function getObjectName(val: any): string;
 /**
  * Returns the stack trace.
  *

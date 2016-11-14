@@ -28,38 +28,52 @@ let remoteDebugger = new RemoteDebugger();
 
 class MyClass {
     public testMethod() {
-        let a = 11;
-        let b = 22;
-        let c = 33;
+        let obj: any = {};
+        obj.i1 = 0.1;
+        obj.i2 = "123";
 
         remoteDebugger.dbg({
-            'a': 11,
-            'b': 22,
-            'c': 33,
+            'a': new Date(),
+            'b':1,
+            'c':2.34,
+            'd':'Marcel K! Marcel K! Marcel K!',
+            'e': false,
+            'f': null,
+            'g':true,
+            'h':{
+                'h1': 0,
+                'h2': 1.2,
+                'h3': remoteDebugger.addHost,
+            },
+            'i': obj,
+            'j': [ 'MK', 'TM' ],
+            'k': function(a, b, c = []) {
+                return 23.979;
+            }
         });
-
-        let aa = '11a';
-        let bb = '22b';
-        let cc = '33c';
 
         remoteDebugger.dbgIf(
             true,
             {
-                'aa': aa,
-                'bb': bb,
-                'cc': cc,
+                'AA': new Date().toString(),
+                'BB': 1,
+                'CC': 2.34,
+                'DD': 'Marcel K! Marcel K! Marcel K!',
+                'EE': false,
+                'FF': null,
+                'GG': true,
             });
-
-        let aaa = '_11a';
-        let bbb = '_22b';
-        let ccc = '_33c';
 
         remoteDebugger.dbgIf(
             () => false,
             {
-                'aaa': aaa,
-                'bbb': bbb,
-                'ccc': ccc,
+                'AAA': new Date().toString(),
+                'BBB': 1,
+                'CCC': 2.34,
+                'DDD': 'Marcel K! Marcel K! Marcel K!',
+                'EEE': false,
+                'FFF': null,
+                'GGG': true,
             });
     }
 }

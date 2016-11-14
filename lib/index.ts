@@ -780,11 +780,35 @@ export class RemoteDebugger {
                     value = '' + value;
                     break;
 
+                case 'function':
+                    ref = ++nextVarRef.value;
+
+                    let funcInfo = nrd_helpers.getFunctionInfo(value);
+                    if (funcInfo) {
+                        // is function / method
+
+                        let obj: RemoteDebuggerVariable[] = [];
+                        type = 'function';
+
+                        entry.fn = funcInfo.name;
+
+                        if (funcInfo.args) {
+                            funcInfo.args.forEach(x => {
+                                obj.push(me.toVariableEntry(x, 'any',
+                                                            0, nextVarRef,
+                                                            step + 1, maxSteps));
+                            });
+                        }
+
+                        value = obj;
+                    }
+                    break;
+
                 case 'object':
                     ref = ++nextVarRef.value;
 
                     if ('[object Array]' == Object.prototype.toString.call(value)) {
-                        let obj = [];
+                        let obj: RemoteDebuggerVariable[] = [];
                         let arr = <any[]>value;
 
                         type = 'array';
@@ -797,9 +821,10 @@ export class RemoteDebugger {
                         value = obj;
                     }
                     else {
-                        entry.on = 'object';
+                        entry.on = nrd_helpers.getObjectName(value);
 
-                        let obj = [];
+                        let obj: RemoteDebuggerVariable[] = [];
+                        type = 'object';
 
                         let propertyNames: string[] = [];
                         for (var k in value) {
