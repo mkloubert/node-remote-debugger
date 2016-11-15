@@ -211,6 +211,11 @@ export interface RemoteDebuggerScope {
  */
 export interface RemoteDebuggerStackFrame {
     /**
+     * Number of the column
+     */
+    c?: number;
+
+    /**
      * The file path.
      */
     f?: string;
@@ -545,6 +550,10 @@ export class RemoteDebugger {
 
                     if (bt.line) {
                         stackFrame.l = bt.line;
+                    }
+
+                    if (bt.column) {
+                        stackFrame.c = bt.column;
                     }
 
                     if (bt.func) {
